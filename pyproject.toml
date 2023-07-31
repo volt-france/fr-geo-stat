@@ -2,9 +2,10 @@
 [tool.poetry]
 name = "frgeostat"
 version = "0.1.1"
-description = ""
+description = "A small package to help creating maps of france with geo statistical data overlays."
 authors = ["volt-france <arno.veletanlic@volteuropa.org>"]
 readme = "README.md"
+homepage = "https://bureaux-vote.v.olt.sh"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
