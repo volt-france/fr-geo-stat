@@ -1,3 +1,5 @@
 *.html
 *.parquet
 notebooks/*.{html,parquet}
+__pycache__
+**/__pycache__
