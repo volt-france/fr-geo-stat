@@ -1,4 +1,6 @@
-# A small package to generate LeafletJS maps of France using `folium`
+[![PyPI version](https://badge.fury.io/py/frgeostat.svg)](https://badge.fury.io/py/frgeostat)
+
+# A package to create LeafletJS maps of France
 
 To install, create a virtualenv using whichever method you want, and either:
 

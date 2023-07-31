@@ -1,7 +1,7 @@
 
 [tool.poetry]
 name = "frgeostat"
-version = "0.1.1-post0"
+version = "0.1.1-post1"
 description = "A small package to help creating maps of france with geo statistical data overlays."
 authors = ["volt-france <arno.veletanlic@volteuropa.org>"]
 readme = "README.md"
