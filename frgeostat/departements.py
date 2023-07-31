@@ -7,8 +7,9 @@ import folium as fl
 import numpy as np
 import requests as rq
 from folium.plugins import Search
-from frgeostat.utils import cerr, SITE_ROOT
+from frgeostat.utils import cerr, SITE_ROOT, cout
 from quickbar import Quickbar
+from unidecode import unidecode
 
 from typing import Generator, Any, Dict, Callable        
 
@@ -109,7 +110,6 @@ class Departements:
                 values = [row[opts[key]] for key in opts if key != 'template']
                 templated = opts['template'](*values)
                 yield code, label, templated
-                    
         
     def propSetterGeoJSON(
         self,
@@ -133,7 +133,8 @@ class Departements:
             
         idx = 0
         for georow in Quickbar.track(geometries['features'], message="Processing geometries.."):
-            rows = data[data[data_on] == georow['properties'][geo_on]].copy()
+            
+            rows = data[data[data_on].astype(str).str.lower().str.contains(str(georow['properties'][geo_on]).lower())].copy()
             for i, r in rows.iterrows():
                 columns = []
                 aliases = []
@@ -141,10 +142,11 @@ class Departements:
                     if col not in columns:
                         columns += [col]
                         aliases += [lab]
-                    geometries['features'][idx]['properties'][col] = val
-                    popup = fl.Popup(f"<a href={SITE_ROOT + f'/map/z/dept/{str(r[popup_on]).lower()}'}><h4>Go to Zone</h4></a>") if popup_on else None
+                    georow['properties'][col] = val
+                    props = georow['properties']
+                    popup = fl.Popup(f"<a href={SITE_ROOT + f'/map/z/dept/{unidecode(props[geo_on]).lower()}' }><h4>Go to Zone</h4></a>") if popup_on else None
                     yield fl.GeoJson(
-                        data={"type":"FeatureCollection", "features": [geometries['features'][idx]]},
+                        data={"type":"FeatureCollection", "features": [georow]},
                         style_function=lambda x: { 'fillColor' : '#00000000', 'lineColor': '#00000000', 'line_opacity':0.01, "weight": 0.01},
                         tooltip=fl.GeoJsonTooltip(fields=columns, aliases=aliases),
                         popup=popup
@@ -178,7 +180,7 @@ class Departements:
         fg = fl.FeatureGroup(name="tooltips")
 
 
-        for geolayer in self.propSetterGeoJSON(data_on='num_dept', geo_on='code', popup_on='name_dept'):
+        for geolayer in self.propSetterGeoJSON(data_on='name_dept', geo_on='nom', popup_on='name_dept'):
             fg.add_child(geolayer)
         
         
