@@ -150,7 +150,7 @@ class Departements:
                     
                     georow['properties'][col] = val
                     props = georow['properties']
-                    popup = fl.Popup(f"<a href={SITE_ROOT + f'/map/z/dept/{processString(props[geo_on])}'}><h4>Go to Zone</h4></a>") if popup_on else None
+                    popup = fl.Popup(f"<a href={SITE_ROOT + f'/#/map/z/dept/{processString(props[geo_on])}'}><h4>Go to Zone</h4></a>") if popup_on else None
                     yield fl.GeoJson(
                         data={"type":"FeatureCollection", "features": [georow]},
                         style_function=lambda x: { 'fillColor' : '#00000000', 'lineColor': '#00000000', 'line_opacity':0.01, "weight": 0.01},
