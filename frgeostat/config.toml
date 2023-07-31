@@ -1,0 +1,35 @@
+[maps]
+
+kind = [
+    'cloropleth',
+    'popup',
+    'redirect'
+]
+
+zone = [
+    'region',
+    'departement',
+    'commune',
+    'bureau'
+]
+
+[aliases]
+
+commune = [
+    'communes',
+    'co',
+    'comm',
+    'villes',
+    'city'
+]
+
+region = [
+    'reg',
+]
+
+departement = [
+    "departements",
+    "dept",
+    "depart",
+    "dep"
+]
