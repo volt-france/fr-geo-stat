@@ -1,10 +1,12 @@
 
 import sys
+import json
 import geopandas as gpd
 import pandas as pd
 import plotly.express as px
 import folium as fl
 import numpy as np
+import shapely
 import requests as rq
 from folium.plugins import Search
 from frgeostat.utils import cerr, SITE_ROOT, cout
@@ -12,6 +14,8 @@ from quickbar import Quickbar
 from unidecode import unidecode
 
 from typing import Generator, Any, Dict, Callable        
+
+processString = lambda s : unidecode(s).lower().replace("'", "")
 
 class Departements:
     def __init__(self, save: bool = False) -> None:
@@ -37,6 +41,7 @@ class Departements:
             min_lat=self.latLow, min_lon=self.lonLow, 
             min_zoom=6
             )
+        self.perDeptMaps = {}
         qbar.bar.remove_task(mkmap)
         proctask = qbar.bar.add_task("Processing metadata ...", total=None, start=True)
         dropcols = [
@@ -142,9 +147,10 @@ class Departements:
                     if col not in columns:
                         columns += [col]
                         aliases += [lab]
+                    
                     georow['properties'][col] = val
                     props = georow['properties']
-                    popup = fl.Popup(f"<a href={SITE_ROOT + f'/map/z/dept/{unidecode(props[geo_on]).lower()}' }><h4>Go to Zone</h4></a>") if popup_on else None
+                    popup = fl.Popup(f"<a href={SITE_ROOT + f'/map/z/dept/{processString(props[geo_on])}'}><h4>Go to Zone</h4></a>") if popup_on else None
                     yield fl.GeoJson(
                         data={"type":"FeatureCollection", "features": [georow]},
                         style_function=lambda x: { 'fillColor' : '#00000000', 'lineColor': '#00000000', 'line_opacity':0.01, "weight": 0.01},
@@ -192,4 +198,27 @@ class Departements:
     def build(self):
         return self.m
     
+    def buildDepts(self):
+        geodf = gpd.read_file("https://france-geojson.gregoiredavid.fr/repo/departements.geojson")
+        deptMaps = {}
+        for i, row in Quickbar.track(geodf.iterrows()):
+            center = [row.geometry.centroid.x, row.geometry.centroid.y]
+
+            lonLow, latLow, lonHigh, latHigh = row.geometry.bounds
+
+            dm = fl.Map(
+                location=center, zoom_start=10,
+                tiles="CartoDB positron", max_bounds=True,
+                max_lat=latHigh, max_lon=lonHigh,
+                min_lat=latLow, min_lon=lonLow, 
+                min_zoom=10
+                )
+            fl.GeoJson(
+                data={"type":"FeatureCollection", "features": [json.loads(shapely.to_geojson(row.geometry))] },
+                style_function=lambda x: { 'line_opacity':0.01, "weight": 0.01, 'opacity': 0.1},
+                ).add_to(dm)
+            
+            deptMaps[processString(row.nom)] = dm
+
+        return deptMaps
     

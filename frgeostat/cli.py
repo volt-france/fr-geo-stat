@@ -48,7 +48,8 @@ def build(
                 cout.log(f"[yellow]Created directory: [dim]{d}[/dim][/yellow]")
             p = p if p.is_file() else d / 'communes.score.map.html' if d else p
             dept.build().save(str(p))
-            
+            for dept, m in dept.buildDepts().items():
+                m.save(p.parent / f"{dept}.zoomed.score.map.html")
         else:
             cout.log("[red]Error:[/red] Incorrect kind of map, exiting..")
             typer.Exit(1)
